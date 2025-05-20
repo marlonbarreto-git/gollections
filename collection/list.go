@@ -28,8 +28,16 @@ func (list List[T]) ToArray() []T {
 }
 
 func (list List[T]) Distinct() List[T] {
-	set := map[any]types.Empty{}
-	var result List[T]
+	if len(list) == 0 {
+		return nil
+	}
+
+	result := make(List[T], 0, len(list))
+	set := make(map[any]types.Empty, len(list))
+
+	if !reflect.TypeOf(list[0]).Comparable() {
+		panic("collection: Distinct requires list elements to be comparable")
+	}
 
 	for _, item := range list {
 		if _, exists := set[item]; !exists {

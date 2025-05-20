@@ -56,6 +56,7 @@ func (s Set[K]) String() string {
 }
 
 func (s Set[K]) Values() (values List[K]) {
+	values = make(List[K], 0, len(s))
 	for k := range s {
 		values = append(values, k)
 	}

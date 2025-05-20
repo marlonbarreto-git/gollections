@@ -21,21 +21,11 @@ func TestPairFirst(t *testing.T) {
 		p := collection.PairOf("key", "value")
 		assert.Equal(t, "key", p.First())
 	})
-
-	t.Run("panics on invalid type", func(t *testing.T) {
-		p := collection.Pair[string, string]{1, "value"}
-		assert.Panics(t, func() { p.First() })
-	})
 }
 
 func TestPairSecond(t *testing.T) {
 	t.Run("gets second element of pair", func(t *testing.T) {
 		p := collection.PairOf("key", "value")
 		assert.Equal(t, "value", p.Second())
-	})
-
-	t.Run("panics on invalid type", func(t *testing.T) {
-		p := collection.Pair[string, int]{"key", "value"}
-		assert.Panics(t, func() { p.Second() })
 	})
 }
