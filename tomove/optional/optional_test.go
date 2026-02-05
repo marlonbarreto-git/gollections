@@ -3,14 +3,13 @@ package optional_test
 import (
 	"testing"
 
+	assert "github.com/marlonbarreto-git/gollections/internal/testing"
 	"github.com/marlonbarreto-git/gollections/tomove/optional"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestOf(t *testing.T) {
 	t.Run("creates optional with non-empty value", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.True(t, opt.IsPresent())
 		value, err := opt.Get()
 		assert.NoError(t, err)
@@ -18,7 +17,7 @@ func TestOf(t *testing.T) {
 	})
 
 	t.Run("creates optional with zero value", func(t *testing.T) {
-		opt := optional.Of[int](0)
+		opt := optional.Of(0)
 		assert.True(t, opt.IsPresent())
 		value, err := opt.Get()
 		assert.NoError(t, err)
@@ -60,7 +59,7 @@ func TestOfValues(t *testing.T) {
 
 func TestOfGet(t *testing.T) {
 	t.Run("creates optional with non-empty supplier", func(t *testing.T) {
-		opt := optional.OfGet[int](func() int { return 10 })
+		opt := optional.OfGet(func() int { return 10 })
 		assert.True(t, opt.IsPresent())
 		value, err := opt.Get()
 		assert.NoError(t, err)
@@ -68,7 +67,7 @@ func TestOfGet(t *testing.T) {
 	})
 
 	t.Run("creates optional with zero supplier", func(t *testing.T) {
-		opt := optional.OfGet[int](func() int { return 0 })
+		opt := optional.OfGet(func() int { return 0 })
 		assert.True(t, opt.IsPresent())
 		value, err := opt.Get()
 		assert.NoError(t, err)
@@ -76,7 +75,7 @@ func TestOfGet(t *testing.T) {
 	})
 
 	t.Run("creates optional with nil supplier", func(t *testing.T) {
-		opt := optional.OfGet[*int](func() *int { return nil })
+		opt := optional.OfGet(func() *int { return nil })
 		assert.False(t, opt.IsPresent())
 		_, err := opt.Get()
 		assert.Error(t, err)
@@ -100,7 +99,6 @@ func TestTakingArg(t *testing.T) {
 	})
 }
 
-// Test for the isEmpty function
 func TestIsEmpty(t *testing.T) {
 	t.Run("checks if struct is empty", func(t *testing.T) {
 		type TestStruct struct {
@@ -145,7 +143,7 @@ func TestIsEmpty(t *testing.T) {
 
 func TestIsPresent(t *testing.T) {
 	t.Run("checks if value is present in non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.True(t, opt.IsPresent())
 	})
 
@@ -157,7 +155,7 @@ func TestIsPresent(t *testing.T) {
 
 func TestIfPresent(t *testing.T) {
 	t.Run("calls consumer if value is present", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		var result int
 		opt.IfPresent(func(value int) { result = value })
 		assert.Equal(t, 10, result)
@@ -173,7 +171,7 @@ func TestIfPresent(t *testing.T) {
 
 func TestGetValue(t *testing.T) {
 	t.Run("gets value from non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.Equal(t, 10, opt.GetValue())
 	})
 
@@ -183,14 +181,14 @@ func TestGetValue(t *testing.T) {
 	})
 
 	t.Run("gets value from optional with supplier", func(t *testing.T) {
-		opt := optional.OfGet[int](func() int { return 20 })
+		opt := optional.OfGet(func() int { return 20 })
 		assert.Equal(t, 20, opt.GetValue())
 	})
 }
 
 func TestGet(t *testing.T) {
 	t.Run("gets value from non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		value, err := opt.Get()
 		assert.NoError(t, err)
 		assert.Equal(t, 10, value)
@@ -203,7 +201,7 @@ func TestGet(t *testing.T) {
 	})
 
 	t.Run("creates optional with panic supplier", func(t *testing.T) {
-		opt := optional.OfGet[*int](func() *int { panic("test error") })
+		opt := optional.OfGet(func() *int { panic("test error") })
 		assert.False(t, opt.IsPresent())
 		_, err := opt.Get()
 		assert.Error(t, err)
@@ -212,7 +210,7 @@ func TestGet(t *testing.T) {
 
 func TestOrElse(t *testing.T) {
 	t.Run("gets value from non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.Equal(t, 10, opt.OrElse(20))
 	})
 
@@ -222,14 +220,14 @@ func TestOrElse(t *testing.T) {
 	})
 
 	t.Run("panics from supplier for OrElsePanic function", func(t *testing.T) {
-		opt := optional.OfGet[int](func() int { panic("test panic") })
+		opt := optional.OfGet(func() int { panic("test panic") })
 		assert.Equal(t, 20, opt.OrElse(20))
 	})
 }
 
 func TestOrElseGet(t *testing.T) {
 	t.Run("gets value from non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.Equal(t, 10, opt.OrElseGet(func() int { return 20 }))
 	})
 
@@ -239,14 +237,14 @@ func TestOrElseGet(t *testing.T) {
 	})
 
 	t.Run("recovers from panic in supplier for OrElseGet function", func(t *testing.T) {
-		opt := optional.OfGet[int](func() int { panic("test panic") })
+		opt := optional.OfGet(func() int { panic("test panic") })
 		assert.Equal(t, 20, opt.OrElseGet(func() int { return 20 }))
 	})
 }
 
 func TestOrElsePanic(t *testing.T) {
 	t.Run("gets value from non-empty optional", func(t *testing.T) {
-		opt := optional.Of[int](10)
+		opt := optional.Of(10)
 		assert.Equal(t, 10, opt.OrElsePanic("no value present"))
 	})
 
@@ -256,7 +254,7 @@ func TestOrElsePanic(t *testing.T) {
 	})
 
 	t.Run("panics from supplier for OrElsePanic function", func(t *testing.T) {
-		opt := optional.OfGet[*int](func() *int { return nil })
+		opt := optional.OfGet(func() *int { return nil })
 		assert.PanicsWithValue(t, "no value present", func() { opt.OrElsePanic("no value present") })
 	})
 }

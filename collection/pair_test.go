@@ -4,8 +4,7 @@ import (
 	"testing"
 
 	"github.com/marlonbarreto-git/gollections/collection"
-
-	"github.com/stretchr/testify/assert"
+	assert "github.com/marlonbarreto-git/gollections/internal/testing"
 )
 
 func TestPairOf(t *testing.T) {

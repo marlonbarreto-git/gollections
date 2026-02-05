@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/marlonbarreto-git/gollections/tomove/function"
+	"github.com/marlonbarreto-git/gollections/tomove/optional"
+	"github.com/marlonbarreto-git/gollections/tomove/types"
 )
 
 type MutableMap[K comparable, V any] map[K]V
@@ -146,4 +148,125 @@ func (m MutableMap[K, V]) stringFallthrough() string {
 	return Map(m, func(k K, v V) (string, any) {
 		return fmt.Sprintf("%v", k), v
 	}).String()
+}
+
+func (m MutableMap[K, V]) GetOrDefault(key K, defaultValue V) V {
+	if value, ok := m[key]; ok {
+		return value
+	}
+	return defaultValue
+}
+
+func (m MutableMap[K, V]) GetOrPut(key K, defaultFn func() V) V {
+	if value, ok := m[key]; ok {
+		return value
+	}
+	value := defaultFn()
+	m[key] = value
+	return value
+}
+
+func (m MutableMap[K, V]) ContainsKey(key K) bool {
+	_, ok := m[key]
+	return ok
+}
+
+func (m MutableMap[K, V]) ContainsValue(value V) bool {
+	for _, v := range m {
+		var valAny any = value
+		var vAny any = v
+		if valAny == vAny {
+			return true
+		}
+	}
+	return false
+}
+
+func (m MutableMap[K, V]) Merge(other MutableMap[K, V]) {
+	for k, v := range other {
+		m[k] = v
+	}
+}
+
+func (m MutableMap[K, V]) PutAll(pairs ...Pair[K, V]) {
+	for _, pair := range pairs {
+		m[pair.First()] = pair.Second()
+	}
+}
+
+func (m MutableMap[K, V]) FilterKeys(predicate func(K) bool) MutableMap[K, V] {
+	result := make(map[K]V)
+	for k, v := range m {
+		if predicate(k) {
+			result[k] = v
+		}
+	}
+	return result
+}
+
+func (m MutableMap[K, V]) FilterValues(predicate func(V) bool) MutableMap[K, V] {
+	result := make(map[K]V)
+	for k, v := range m {
+		if predicate(v) {
+			result[k] = v
+		}
+	}
+	return result
+}
+
+func (m MutableMap[K, V]) ToList() []Pair[K, V] {
+	result := make([]Pair[K, V], 0, len(m))
+	for k, v := range m {
+		result = append(result, PairOf(k, v))
+	}
+	return result
+}
+
+func (m MutableMap[K, V]) Any(predicate function.BiPredicate[K, V]) bool {
+	for k, v := range m {
+		if predicate(k, v) {
+			return true
+		}
+	}
+	return false
+}
+
+func (m MutableMap[K, V]) All(predicate function.BiPredicate[K, V]) bool {
+	for k, v := range m {
+		if !predicate(k, v) {
+			return false
+		}
+	}
+	return true
+}
+
+func (m MutableMap[K, V]) None(predicate function.BiPredicate[K, V]) bool {
+	return !m.Any(predicate)
+}
+
+func (m MutableMap[K, V]) ToSet() Set[K] {
+	result := make(Set[K], len(m))
+	for k := range m {
+		result[k] = types.EmptyInstance
+	}
+	return result
+}
+
+func (m MutableMap[K, V]) Also(fn func(MutableMap[K, V])) MutableMap[K, V] {
+	fn(m)
+	return m
+}
+
+func (m MutableMap[K, V]) TakeIf(predicate func(MutableMap[K, V]) bool) optional.Optional[MutableMap[K, V]] {
+	if predicate(m) {
+		return optional.Of(m)
+	}
+	return optional.Empty[MutableMap[K, V]]()
+}
+
+func (m MutableMap[K, V]) TakeUnless(predicate func(MutableMap[K, V]) bool) optional.Optional[MutableMap[K, V]] {
+	if !predicate(m) {
+		return optional.Of(m)
+	}
+	return optional.Empty[MutableMap[K, V]]()
 }
