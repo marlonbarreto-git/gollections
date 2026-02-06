@@ -12,7 +12,7 @@ import (
 type MutableMap[K comparable, V any] map[K]V
 
 func Map[K, NK comparable, V, NV any](original MutableMap[K, V], fn func(K, V) (NK, NV)) MutableMap[NK, NV] {
-	newMap := map[NK]NV{}
+	newMap := make(map[NK]NV, len(original))
 
 	for key, value := range original {
 		newKey, newValue := fn(key, value)
@@ -23,7 +23,7 @@ func Map[K, NK comparable, V, NV any](original MutableMap[K, V], fn func(K, V) (
 }
 
 func MapKeys[K, NK comparable, V any](original MutableMap[K, V], fn func(K, V) NK) MutableMap[NK, V] {
-	newMap := map[NK]V{}
+	newMap := make(map[NK]V, len(original))
 
 	for key, value := range original {
 		newMap[fn(key, value)] = value
@@ -33,7 +33,7 @@ func MapKeys[K, NK comparable, V any](original MutableMap[K, V], fn func(K, V) N
 }
 
 func MapValues[K comparable, V, NV any](original MutableMap[K, V], fn func(K, V) NV) MutableMap[K, NV] {
-	newMap := map[K]NV{}
+	newMap := make(map[K]NV, len(original))
 
 	for key, value := range original {
 		newMap[key] = fn(key, value)
@@ -43,7 +43,7 @@ func MapValues[K comparable, V, NV any](original MutableMap[K, V], fn func(K, V)
 }
 
 func (m MutableMap[K, V]) Map(fn func(K, V) (any, any)) MutableMap[any, any] {
-	newMap := map[any]any{}
+	newMap := make(map[any]any, len(m))
 
 	for key, value := range m {
 		newKey, newValue := fn(key, value)
@@ -68,7 +68,7 @@ func (m MutableMap[K, V]) ForEach(consumer function.BiConsumer[K, V]) {
 }
 
 func (m MutableMap[K, V]) Filter(predicate function.BiPredicate[K, V]) MutableMap[K, V] {
-	filteredMap := map[K]V{}
+	filteredMap := make(map[K]V, len(m))
 
 	for k, v := range m {
 		if predicate(k, v) {
@@ -108,6 +108,7 @@ func (m MutableMap[K, V]) Copy() MutableMap[K, V] {
 }
 
 func (m MutableMap[K, V]) Keys() (keys List[K]) {
+	keys = make(List[K], 0, len(m))
 	for key := range m {
 		keys = append(keys, key)
 	}
@@ -116,6 +117,7 @@ func (m MutableMap[K, V]) Keys() (keys List[K]) {
 }
 
 func (m MutableMap[K, V]) Values() (values List[V]) {
+	values = make(List[V], 0, len(m))
 	for _, value := range m {
 		values = append(values, value)
 	}
@@ -124,6 +126,7 @@ func (m MutableMap[K, V]) Values() (values List[V]) {
 }
 
 func (m MutableMap[K, V]) Entries() (values []Pair[K, V]) {
+	values = make([]Pair[K, V], 0, len(m))
 	for k, v := range m {
 		values = append(values, PairOf(k, v))
 	}
